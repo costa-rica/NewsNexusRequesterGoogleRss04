@@ -94,7 +94,7 @@ NAME_DB=newsnexus10.db
   - `and_exact_phrases`: quoted exact phrases for AND searches
   - `or_keywords`: comma-separated keywords for OR searches
   - `or_exact_phrases`: quoted exact phrases for OR searches
-  - `time_range`: string such as `1d`. The current state only seems to use days. So `1d`, `2d`, `3d`, etc. Or it could be left blank.
+  - `time_range`: string such as `1d`. The current state only seems to use days. So `1d`, `2d`, `3d`, etc. Or it could be left blank. If left blank or invalid, it will default to 180d.
 
 ### Semantic Scorer Keywords Spreadsheet (Excel)
 
