@@ -65,4 +65,4 @@ If the project spawns child processes, include a sub section for each child proc
 
 ## References
 
-My projects will usually have instructions for logging (i.e. docs/LOGGING_NODE_JS_V06.md) or other instructions in the docs folder. Include a reference to those files here. No need to explain what they are, just reference them.
+My projects will usually have instructions for logging (i.e. docs/LOGGING_NODE_JS_V06.md) or other instructions in the docs folder. Include a reference to those files here. No need to explain what they are, just reference them with links so when the project is on GitHub, the links work.
