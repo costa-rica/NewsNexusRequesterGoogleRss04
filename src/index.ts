@@ -79,7 +79,12 @@ async function delay(ms: number) {
     }
 
     const requestUrl = buildRssUrl(queryResult.query);
-    logger.info(`Requesting RSS: ${requestUrl}`);
+    const timeRangeNote = queryResult.timeRangeInvalid
+      ? " - invalid time_range"
+      : "";
+    logger.info(
+      `Requesting RSS (${queryResult.timeRange}${timeRangeNote}): ${requestUrl}`,
+    );
 
     const response = await fetchRssItems(requestUrl);
 

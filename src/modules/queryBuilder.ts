@@ -4,7 +4,28 @@ export interface QueryBuildResult {
   query: string;
   andString: string | null;
   orString: string | null;
-  timeRange?: string;
+  timeRange: string;
+  timeRangeInvalid: boolean;
+}
+
+const DEFAULT_TIME_RANGE = "180d";
+
+function normalizeTimeRange(value?: string): {
+  timeRange: string;
+  timeRangeInvalid: boolean;
+} {
+  const trimmed = value?.trim() ?? "";
+  if (!trimmed) {
+    return { timeRange: DEFAULT_TIME_RANGE, timeRangeInvalid: false };
+  }
+  if (!/^\d+d$/.test(trimmed)) {
+    return { timeRange: DEFAULT_TIME_RANGE, timeRangeInvalid: true };
+  }
+  const days = Number.parseInt(trimmed.slice(0, -1), 10);
+  if (!Number.isFinite(days) || days <= 0) {
+    return { timeRange: DEFAULT_TIME_RANGE, timeRangeInvalid: true };
+  }
+  return { timeRange: trimmed, timeRangeInvalid: false };
 }
 
 function splitCsv(value?: string): string[] {
@@ -64,16 +85,15 @@ export function buildQuery(row: QueryRow): QueryBuildResult {
     queryParts.push(andTerms.length > 0 && orTerms.length > 1 ? `(${orExpression})` : orExpression);
   }
 
-  const timeRange = row.time_range?.trim();
-  if (timeRange) {
-    queryParts.push(`when:${timeRange}`);
-  }
+  const { timeRange, timeRangeInvalid } = normalizeTimeRange(row.time_range);
+  queryParts.push(`when:${timeRange}`);
 
   return {
     query: queryParts.join(" ").trim(),
     andString: combineForDb(row.and_keywords, row.and_exact_phrases),
     orString: combineForDb(row.or_keywords, row.or_exact_phrases),
-    timeRange: timeRange || undefined,
+    timeRange,
+    timeRangeInvalid,
   };
 }
 
