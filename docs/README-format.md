@@ -23,15 +23,45 @@ This section should explain how to use the project. If this is an app that runs 
 
 ## Project Structure
 
-Use a tree structure to show the project structure. Certain folders do not need to show all files, like an API routes we only need to show at most 5 routes. If there are subfolders, show those and only a few files in each subfolder.
+Use a tree structure to show the project structure. Certain folders do not need to show all files, like an API routes we only need to show at most 5 routes. If there are subfolders, show those and only a few files in each subfolder. Here is an example:
+
+```
+PersonalWeb03-API/
+├── src/
+│   ├── routers/
+│   │   ├── auth.py       # Authentication endpoints
+│   │   └── blog.py       # Blog endpoints
+│   ├── models.py         # SQLAlchemy database models
+│   ├── schemas.py        # Pydantic validation schemas
+│   ├── auth.py           # Authentication utilities
+│   ├── database.py       # Database configuration
+│   └── main.py           # FastAPI application
+├── docs/
+│   └── API_REFERENCE.md
+├── requirements.txt
+├── .env
+├── .env.example
+└── README.md
+```
 
 ## .env
 
-This section should explain the environment variables used in the project. Include the name of the environment variable and a brief description of what it is used for. Do not include the value of the environment variable.
+This section should just show the environment variables used in the project. Include the value of the environment variables if they are not secret. Here is an example:
+
+```
+NAME_APP=NewsNexus10
+JWT_SECRET=
+NAME_DB=newsnexus10.db
+PATH_DATABASE=/home/shared/databases/NewsNexus10/
+```
 
 ## External Files (optional)
 
-If usage requires external files, such as a spreadsheet, text file, etc. Create a sub section for each file. Include the naming convention and the expected contents of the file. If it is a spreadsheet that the project will read from, include the column headers and what each column is used for. If it is a spreadsheet that the project will write to, explain the output columns. If a JSON file is used or made, include the structure of the file.
+If usage requires external files, such as a spreadsheet, text file, etc. Create a sub section for each file. Include the naming convention and the expected contents of the file. If it is a spreadsheet that the project will read from, include the column headers and what each column is used for. If it is a spreadsheet that the project will write to, explain the output columns. If a JSON file is used or made, include the structure of the file. Keep this section concise - short is better than long.
+
+## Child Processes (optional)
+
+If the project spawns child processes, include a sub section for each child process. List the related .env variables and how logging is handled for that process. Keep this section concise - short is better than long.
 
 ## References
 
