@@ -7,6 +7,7 @@ This is a Node.js/TypeScript microservice that reads a query spreadsheet, builds
 ## Setup
 
 1. Ensure the local dependency exists at `../NewsNexus10Db`.
+   - To install directly (locally): `npm install file:../NewsNexus10Db`
 2. Install dependencies: `npm install`.
 3. Build the project: `npm run build`.
 

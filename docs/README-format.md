@@ -17,6 +17,13 @@ This section should be a concise overview of the project. It should be no more t
 
 This should include how to install. Do not list packages. If there is a custom package that needs to be installed, it should be mentioned here and how to install it. If the project is a TypeScript so we need `npm install` and `npm build`. If it's a Python project, include examples of creating the venv.
 
+Here is an example with a custom package:
+
+1. Ensure the local dependency exists at `../NewsNexus10Db`.
+   - To install directly (locally): `npm install file:../NewsNexus10Db`
+2. Install dependencies: `npm install`.
+3. Build the project: `npm run build`.
+
 ## Usage
 
 This section should explain how to use the project. If this is an app that runs on the terminal with arguments, include examples of how to run it with different arguments. If it's a web app, include the URL to access it. If it's a library, include examples of how to use it.
