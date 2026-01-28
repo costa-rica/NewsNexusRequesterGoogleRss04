@@ -89,12 +89,12 @@ NAME_DB=newsnexus10.db
 - Naming: Any `.xlsx` file path configured by `PATH_AND_FILENAME_FOR_QUERY_SPREADSHEET_AUTOMATED`.
 - Worksheet: Uses the first worksheet only.
 - Required columns:
-  - `id`: integer identifier for the row (optional, used for logging)
+  - `id`: integer identifier for the row (optional, used for logging, still runs fine without it)
   - `and_keywords`: comma-separated keywords for AND searches
   - `and_exact_phrases`: quoted exact phrases for AND searches
   - `or_keywords`: comma-separated keywords for OR searches
   - `or_exact_phrases`: quoted exact phrases for OR searches
-  - `time_range`: string such as `1d`, `1w`, `1m`, or `1y` for Google News time filters
+  - `time_range`: string such as `1d`. The current state only seems to use days. So `1d`, `2d`, `3d`, etc. Or it could be left blank.
 
 ### Semantic Scorer Keywords Spreadsheet (Excel)
 
