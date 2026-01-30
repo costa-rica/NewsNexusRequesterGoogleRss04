@@ -90,11 +90,35 @@ NAME_DB=newsnexus10.db
 - Worksheet: Uses the first worksheet only.
 - Required columns:
   - `id`: integer identifier for the row (optional, used for logging, still runs fine without it)
-  - `and_keywords`: comma-separated keywords for AND searches
-  - `and_exact_phrases`: quoted exact phrases for AND searches
-  - `or_keywords`: comma-separated keywords for OR searches
-  - `or_exact_phrases`: quoted exact phrases for OR searches
+  - `and_keywords`: comma-separated keywords (spaces optional) for AND searches
+  - `and_exact_phrases`: comma-separated quoted exact phrases (spaces optional, double or single quotes accepted) for AND searches
+  - `or_keywords`: comma-separated keywords (spaces optional) for OR searches
+  - `or_exact_phrases`: comma-separated quoted exact phrases (spaces optional, double or single quotes accepted) for OR searches
   - `time_range`: string such as `1d`. The current state only seems to use days. So `1d`, `2d`, `3d`, etc. Or it could be left blank. If left blank or invalid, it will default to 180d.
+
+#### Exact Phrases Formatting
+
+For `and_exact_phrases` and `or_exact_phrases` columns, quotes are optional but recommended for clarity. The system automatically adds double quotes to multi-word phrases if not provided.
+
+**Examples:**
+
+Input in spreadsheet:
+```
+climate change, global warming
+```
+Result in query: `"climate change" "global warming"`
+
+Input in spreadsheet:
+```
+"climate change", "global warming"
+```
+Result in query: `"climate change" "global warming"`
+
+Input in spreadsheet:
+```
+'climate change', 'global warming'
+```
+Result in query: `'climate change' 'global warming'`
 
 ### Semantic Scorer Keywords Spreadsheet (Excel)
 
