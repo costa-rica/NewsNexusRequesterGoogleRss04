@@ -61,8 +61,11 @@ async function delay(ms: number) {
   const { initModels } = require("newsnexus10db");
   initModels();
 
-  const { ensureAggregatorSourceAndEntity, storeRequestAndArticles } =
-    await import("./modules/storage");
+  const {
+    ensureAggregatorSourceAndEntity,
+    storeRequestAndArticles,
+    wasRequestMadeToday,
+  } = await import("./modules/storage");
 
   const { newsArticleAggregatorSourceId, entityWhoFoundArticleId } =
     await ensureAggregatorSourceAndEntity(nameOfOrg);
@@ -79,6 +82,15 @@ async function delay(ms: number) {
     }
 
     const requestUrl = buildRssUrl(queryResult.query);
+
+    const alreadyRequested = await wasRequestMadeToday(requestUrl);
+    if (alreadyRequested) {
+      logger.info(
+        `Skipping RSS request (id: ${row.id}): already requested today: ${requestUrl}`,
+      );
+      continue;
+    }
+
     const timeRangeNote = queryResult.timeRangeInvalid
       ? " - invalid time_range"
       : "";

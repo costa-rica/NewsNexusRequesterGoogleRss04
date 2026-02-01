@@ -89,6 +89,7 @@ PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/path/to/semantic_scorer_keywords.xl
    - For each row:
      - Build query string with AND/OR keywords and time range (modules/queryBuilder.ts)
      - Construct RSS URL with Google parameters (modules/queryBuilder.ts)
+     - Check if URL was already requested today (modules/storage.ts) - skip if duplicate found
      - Fetch RSS items (modules/rssFetcher.ts)
      - Store request and articles to database (modules/storage.ts)
    - Skip rows with empty queries
@@ -112,6 +113,8 @@ PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/path/to/semantic_scorer_keywords.xl
 **src/modules/spreadsheet.ts**: Excel file reader using ExcelJS
 - Reads first worksheet only
 - Maps columns: id, and_keywords, and_exact_phrases, or_keywords, or_exact_phrases, time_range
+- Validates that all rows have a valid numeric id (throws error if missing)
+- Validates that all id values are unique (throws error if duplicates found)
 
 **src/modules/queryBuilder.ts**: Query construction logic
 - Combines AND/OR keywords and exact phrases
@@ -125,6 +128,7 @@ PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/path/to/semantic_scorer_keywords.xl
 - Returns items array and status
 
 **src/modules/storage.ts**: Database write operations
+- Checks for duplicate requests by URL and date (prevents same-day re-requests)
 - Creates/finds NewsArticleAggregatorSource and EntityWhoFoundArticle
 - Creates NewsApiRequest records with query metadata
 - Deduplicates articles by URL (skips existing)
@@ -213,7 +217,7 @@ See docs/LOGGING_NODE_JS_V06.md for complete specifications.
 **Worksheet**: First sheet only
 
 **Columns**:
-- `id`: (optional) Integer identifier for logging
+- `id`: (required) Integer identifier - must be unique across all rows, used for logging and tracking
 - `and_keywords`: Comma-separated keywords for AND searches
 - `and_exact_phrases`: Quoted exact phrases for AND searches
 - `or_keywords`: Comma-separated keywords for OR searches
@@ -235,6 +239,14 @@ Default: 180 days (queryBuilder.ts:11)
 - Accepts format: `\d+d` (e.g., "1d", "7d", "30d")
 - Invalid/blank values default to 180d
 - Logs warning when time_range is invalid
+
+### Request Deduplication
+
+Requests are deduplicated by URL and date (storage.ts:11-22, index.ts:86-92):
+- Before making each RSS request, checks NewsApiRequest table for matching URL and today's date
+- Skips request if URL was already requested on the same day
+- Logs skipped requests with id and URL: `Skipping RSS request (id: #): already requested today: [url]`
+- Prevents redundant API calls and duplicate processing
 
 ### Article Deduplication
 

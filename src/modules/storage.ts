@@ -8,6 +8,19 @@ import {
 import logger from "./logger";
 import { RssItem } from "./rssFetcher";
 
+export async function wasRequestMadeToday(url: string): Promise<boolean> {
+  const today = new Date().toISOString().split("T")[0];
+
+  const existingRequest = await NewsApiRequest.findOne({
+    where: {
+      url,
+      dateEndOfRequest: today,
+    },
+  });
+
+  return existingRequest !== null;
+}
+
 export async function ensureAggregatorSourceAndEntity(nameOfOrg: string) {
   let source = await NewsArticleAggregatorSource.findOne({
     where: { nameOfOrg },
