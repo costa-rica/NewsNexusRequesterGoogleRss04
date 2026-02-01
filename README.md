@@ -89,7 +89,7 @@ NAME_DB=newsnexus10.db
 - Naming: Any `.xlsx` file path configured by `PATH_AND_FILENAME_FOR_QUERY_SPREADSHEET_AUTOMATED`.
 - Worksheet: Uses the first worksheet only.
 - Required columns:
-  - `id`: integer identifier for the row (optional, used for logging, still runs fine without it)
+  - `id`: integer identifier for the row (required)
   - `and_keywords`: comma-separated keywords (spaces optional) for AND searches
   - `and_exact_phrases`: comma-separated quoted exact phrases (spaces optional, double or single quotes accepted) for AND searches
   - `or_keywords`: comma-separated keywords (spaces optional) for OR searches
@@ -103,21 +103,27 @@ For `and_exact_phrases` and `or_exact_phrases` columns, quotes are optional but 
 **Examples:**
 
 Input in spreadsheet:
+
 ```
 climate change, global warming
 ```
+
 Result in query: `"climate change" "global warming"`
 
 Input in spreadsheet:
+
 ```
 "climate change", "global warming"
 ```
+
 Result in query: `"climate change" "global warming"`
 
 Input in spreadsheet:
+
 ```
 'climate change', 'global warming'
 ```
+
 Result in query: `'climate change' 'global warming'`
 
 ### Semantic Scorer Keywords Spreadsheet (Excel)

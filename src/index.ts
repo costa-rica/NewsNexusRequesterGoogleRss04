@@ -74,7 +74,7 @@ async function delay(ms: number) {
     const queryResult = buildQuery(row);
 
     if (!queryResult.query) {
-      logger.warn(`Skipping row ${row.id ?? "unknown"}: empty query.`);
+      logger.warn(`Skipping row ${row.id}: empty query.`);
       continue;
     }
 
@@ -83,7 +83,7 @@ async function delay(ms: number) {
       ? " - invalid time_range"
       : "";
     logger.info(
-      `Requesting RSS (${queryResult.timeRange}${timeRangeNote}): ${requestUrl}`,
+      `Requesting RSS (id: ${row.id}, ${queryResult.timeRange}${timeRangeNote}): ${requestUrl}`,
     );
 
     const response = await fetchRssItems(requestUrl);

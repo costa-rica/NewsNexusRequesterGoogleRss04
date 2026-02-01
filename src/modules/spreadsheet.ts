@@ -91,14 +91,29 @@ export async function readQuerySpreadsheet(
 
     const idNumber = Number.parseInt(rowValues.id, 10);
 
+    if (Number.isNaN(idNumber) || !rowValues.id) {
+      throw new Error(
+        `Missing or invalid id in row ${rowIndex}. All rows must have a valid numeric id.`,
+      );
+    }
+
     rows.push({
-      id: Number.isNaN(idNumber) ? undefined : idNumber,
+      id: idNumber,
       and_keywords: rowValues.and_keywords,
       and_exact_phrases: rowValues.and_exact_phrases,
       or_keywords: rowValues.or_keywords,
       or_exact_phrases: rowValues.or_exact_phrases,
       time_range: rowValues.time_range,
     });
+  }
+
+  const ids = rows.map((row) => row.id);
+  const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+  if (duplicateIds.length > 0) {
+    const uniqueDuplicates = [...new Set(duplicateIds)];
+    throw new Error(
+      `Duplicate id values found in spreadsheet: ${uniqueDuplicates.join(", ")}. All id values must be unique.`,
+    );
   }
 
   return rows;

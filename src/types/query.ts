@@ -1,5 +1,5 @@
 export interface QueryRow {
-  id?: number;
+  id: number;
   and_keywords?: string;
   and_exact_phrases?: string;
   or_keywords?: string;
