@@ -58,6 +58,30 @@ async function delay(ms: number) {
     process.exit(1);
   }
 
+  const delayBetweenRequestsMs = (() => {
+    const envValue = process.env.MILISECONDS_IN_BETWEEN_REQUESTS;
+    if (!envValue) {
+      return 5000;
+    }
+    const parsed = Number.parseInt(envValue, 10);
+    if (Number.isNaN(parsed) || parsed < 500 || parsed > 10000) {
+      const message = `Invalid MILISECONDS_IN_BETWEEN_REQUESTS: ${envValue}. Must be between 500 and 10000.`;
+      logger.error(message);
+      console.error(message);
+      return null;
+    }
+    return parsed;
+  })();
+
+  if (delayBetweenRequestsMs === null) {
+    await delay(100);
+    process.exit(1);
+  }
+
+  logger.info(
+    `Delay between requests: ${delayBetweenRequestsMs}ms (${(delayBetweenRequestsMs / 1000).toFixed(1)}s)`,
+  );
+
   const { initModels } = require("newsnexus10db");
   initModels();
 
@@ -100,6 +124,14 @@ async function delay(ms: number) {
 
     const response = await fetchRssItems(requestUrl);
 
+    if (response.statusCode === 503) {
+      const message = `HTTP 503 Service Unavailable (id: ${row.id}): ${requestUrl}. Google RSS rate limit likely exceeded. Try increasing MILISECONDS_IN_BETWEEN_REQUESTS (current: ${delayBetweenRequestsMs}ms).`;
+      logger.error(message);
+      console.error(message);
+      await delay(100);
+      process.exit(1);
+    }
+
     await storeRequestAndArticles({
       requestUrl,
       andString: queryResult.andString,
@@ -110,6 +142,8 @@ async function delay(ms: number) {
       newsArticleAggregatorSourceId,
       entityWhoFoundArticleId,
     });
+
+    await delay(delayBetweenRequestsMs);
   }
 
   await runSemanticScorer();

@@ -39,6 +39,7 @@ export async function fetchRssItems(url: string): Promise<{
   status: "success" | "error";
   items: RssItem[];
   error?: string;
+  statusCode?: number;
 }> {
   try {
     const controller = new AbortController();
@@ -56,7 +57,12 @@ export async function fetchRssItems(url: string): Promise<{
     if (!response.ok) {
       const errorMessage = `RSS request failed with status ${response.status}`;
       logger.error(errorMessage);
-      return { status: "error", items: [], error: errorMessage };
+      return {
+        status: "error",
+        items: [],
+        error: errorMessage,
+        statusCode: response.status,
+      };
     }
 
     const xml = await response.text();

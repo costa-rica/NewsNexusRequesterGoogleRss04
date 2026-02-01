@@ -62,6 +62,9 @@ GOOGLE_RSS_HL=en-US
 GOOGLE_RSS_GL=US
 GOOGLE_RSS_CEID=US:en
 
+# Rate Limiting Configuration
+MILISECONDS_IN_BETWEEN_REQUESTS=5000  # Optional: delay between RSS requests (500-10000ms, default: 5000)
+
 # Semantic Scorer Child Process
 PATH_AND_FILENAME_TO_SEMANTIC_SCORER=/path/to/semantic_scorer/index.js
 NAME_CHILD_PROCESS_SEMANTIC_SCORER=
@@ -73,25 +76,29 @@ PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/path/to/semantic_scorer_keywords.xl
 
 ### Core Workflow (src/index.ts)
 
-1. **Initialization** (index.ts:1-62)
+1. **Initialization** (index.ts:1-86)
    - Load environment variables via dotenv
    - Initialize Winston logger first (modules/logger.ts)
    - Evaluate time guardrail (modules/guardrail.ts) - exits if outside configured window unless `--run-anyway` flag is used
    - Validate required environment variables (exits on missing vars)
+   - Validate and configure rate limiting (MILISECONDS_IN_BETWEEN_REQUESTS) - exits if present but outside range
+   - Log configured delay between requests
    - **CRITICAL**: Initialize database models via `initModels()` from `newsnexus10db` package BEFORE importing storage module
 
 2. **Source and Entity Setup** (index.ts:64-68)
    - Ensure NewsArticleAggregatorSource exists for the organization
    - Ensure EntityWhoFoundArticle exists for tracking article discovery
 
-3. **Query Processing** (index.ts:70-101)
+3. **Query Processing** (index.ts:100-147)
    - Read query spreadsheet (modules/spreadsheet.ts)
    - For each row:
      - Build query string with AND/OR keywords and time range (modules/queryBuilder.ts)
      - Construct RSS URL with Google parameters (modules/queryBuilder.ts)
      - Check if URL was already requested today (modules/storage.ts) - skip if duplicate found
      - Fetch RSS items (modules/rssFetcher.ts)
+     - Check for HTTP 503 errors - exit immediately if rate limit exceeded
      - Store request and articles to database (modules/storage.ts)
+     - Apply configured delay before next request
    - Skip rows with empty queries
 
 4. **Post-Processing** (index.ts:103)
@@ -125,7 +132,8 @@ PATH_TO_SEMANTIC_SCORER_KEYWORDS_EXCEL_FILE=/path/to/semantic_scorer_keywords.xl
 **src/modules/rssFetcher.ts**: RSS fetching with xml2js parsing
 - Fetches from Google News RSS endpoint
 - Parses XML to extract articles (title, link, description, source, pubDate, content)
-- Returns items array and status
+- Returns items array, status, and HTTP status code (for error detection)
+- 20 second timeout on requests
 
 **src/modules/storage.ts**: Database write operations
 - Checks for duplicate requests by URL and date (prevents same-day re-requests)
@@ -239,6 +247,18 @@ Default: 180 days (queryBuilder.ts:11)
 - Accepts format: `\d+d` (e.g., "1d", "7d", "30d")
 - Invalid/blank values default to 180d
 - Logs warning when time_range is invalid
+
+### Rate Limiting
+
+Configurable delay between RSS requests (index.ts:61-83, 127-133, 146):
+- Configured via `MILISECONDS_IN_BETWEEN_REQUESTS` environment variable (optional)
+- Default: 5000ms (5 seconds) if not specified
+- Valid range: 500-10000ms (0.5-10 seconds)
+- Service exits with error if value is present but outside valid range
+- Delay applied AFTER each successful RSS request and database storage
+- No delay for skipped requests (empty queries, duplicates)
+- Logs configured delay at startup: `Delay between requests: 5000ms (5.0s)`
+- **503 Error Handling**: Service immediately stops on HTTP 503 (rate limit exceeded) with suggestion to increase delay
 
 ### Request Deduplication
 
